@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mi CarrerAI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F6; --surface:#FFFFFF; --ink:#16222F; --muted:#5A6978; --line:#D8E0E8; --soft:#F5F8FB;
+  --m-LM:#F3D27A; --m-TC:#F2A065; --m-SCP:#E27C7C; --m-M:#5A8DEE; --m-PI:#93BDEA; --m-none:#B9C3CD;
+  --on-m:#16222F;
+  --st-ap-bg:#D9EFDF; --st-ap:#1D5A33;
+  --st-cur-bg:#DAE7FB; --st-cur:#1F4C9A;
+  --st-ex-bg:#FBE6C4; --st-ex:#7A4A05;
+  --st-pen-bg:#E6EBF0; --st-pen:#4B5967;
+  --focus:#2F6FE0;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1720; --surface:#17222E; --ink:#E9EFF5; --muted:#92A2B2; --line:#2A3847; --soft:#1C2937;
+    --m-LM:#D9B85A; --m-TC:#E08C4F; --m-SCP:#CF6767; --m-M:#4C7BD6; --m-PI:#7AA6D6; --m-none:#5B6874;
+    --st-ap-bg:#1C3A29; --st-ap:#8FD6A8; --st-cur-bg:#1D3355; --st-cur:#9CC0F5;
+    --st-ex-bg:#493712; --st-ex:#F0C77C; --st-pen-bg:#2A3643; --st-pen:#A9B7C5;
+    --focus:#7BA7F5;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1720; --surface:#17222E; --ink:#E9EFF5; --muted:#92A2B2; --line:#2A3847; --soft:#1C2937;
+  --m-LM:#D9B85A; --m-TC:#E08C4F; --m-SCP:#CF6767; --m-M:#4C7BD6; --m-PI:#7AA6D6; --m-none:#5B6874;
+  --st-ap-bg:#1C3A29; --st-ap:#8FD6A8; --st-cur-bg:#1D3355; --st-cur:#9CC0F5;
+  --st-ex-bg:#493712; --st-ex:#F0C77C; --st-pen-bg:#2A3643; --st-pen:#A9B7C5;
+  --focus:#7BA7F5;
+}
+html{height:100%;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 60px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:400 15px/1.45 "Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Public Sans",system-ui,sans-serif;margin:0;font-weight:700;letter-spacing:-.01em}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 80px}
+header.top{padding:20px 0 10px}
+header.top h1{font-size:26px}
+header.top p{margin:2px 0 0;color:var(--muted)}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:8px 0;display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:18px}
+nav.tabs button{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 6px;font-weight:600;color:var(--muted)}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+section.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.hero .big{font:700 56px/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
+.hero .big span{font-size:22px;font-weight:500;color:var(--muted);letter-spacing:0;margin-left:6px}
+.hero p{margin:8px 0 14px;color:var(--muted)}
+.stack{display:flex;height:22px;border-radius:7px;overflow:hidden;background:var(--line)}
+.stack i{display:block;height:100%;border-right:2px solid var(--surface)}
+.stack i:last-child{border-right:0}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:13px;color:var(--muted)}
+.legend b{color:var(--ink);font-weight:600}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+h2{font-size:18px;margin-bottom:12px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.mod{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--soft)}
+.mod .n{display:flex;justify-content:space-between;align-items:baseline;font-weight:600}
+.mod .v{font:700 24px/1.1 "Bricolage Grotesque",sans-serif;margin:6px 0 8px}
+.mod .v small{font:500 13px "Public Sans",sans-serif;color:var(--muted)}
+.chip{display:inline-block;min-width:34px;text-align:center;padding:1px 8px;border-radius:7px;background:var(--c);color:var(--on-m);font-weight:600;font-size:13px}
+.bar{height:9px;border-radius:5px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--c,var(--ink));border-radius:5px}
+.sub{font-size:13px;color:var(--muted);margin-top:6px}
+.cyc{border-top:1px solid var(--line);padding:14px 0}
+.cyc:first-of-type{border-top:0;padding-top:0}
+.cyc:last-child{padding-bottom:0}
+.cyc .hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.cyc .hd b{font-family:"Bricolage Grotesque",sans-serif;font-size:16px}
+.two{display:grid;gap:10px 18px;grid-template-columns:1fr 1fr}
+@media (max-width:520px){.two{grid-template-columns:1fr}.hero .big{font-size:46px}}
+.lbl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px}
+.lbl span:last-child{color:var(--muted)}
+.alert{background:var(--st-ex-bg);color:var(--st-ex);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:16px}
+.sem{margin-bottom:22px}
+.sem .hd{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 12px;margin-bottom:8px}
+.sem .hd h2{margin:0}
+.tog{display:inline-flex;align-items:center;gap:8px;background:none;border:0;padding:4px 0;font:inherit;letter-spacing:inherit;color:inherit;cursor:pointer;text-align:left}
+.tog::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin:-3px 4px 0 2px;transition:transform .15s}
+.tog[aria-expanded="false"]::before{transform:rotate(-45deg);margin:0 4px 0 0}
+@media (prefers-reduced-motion:reduce){.tog::before{transition:none}}
+.sem .hd span{font-size:13px;color:var(--muted)}
+.row{width:100%;display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 0;margin-bottom:8px;overflow:hidden}
+.row .stripe{align-self:stretch;background:var(--c)}
+.row .main b{display:block;font-weight:600}
+.row .main small{display:block;color:var(--muted);font-size:13px}
+.row .right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.row .fin{font:700 20px/1 "Bricolage Grotesque",sans-serif;min-width:24px;text-align:right}
+.pill{font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px}
+.st-ap{background:var(--st-ap-bg);color:var(--st-ap)}
+.st-cur{background:var(--st-cur-bg);color:var(--st-cur)}
+.st-ex{background:var(--st-ex-bg);color:var(--st-ex)}
+.st-pen{background:var(--st-pen-bg);color:var(--st-pen)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-weight:600}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.danger{color:#B3261E;border-color:currentColor}
+.btn.add{width:100%;border-style:dashed;color:var(--muted);background:transparent}
+.empty{color:var(--muted);font-size:14px;margin:0 0 8px}
+a{color:var(--focus)}
+.req{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.req li{display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:start}
+.req .pill{text-align:center}
+.req b{display:block;font-weight:600}
+.req small{color:var(--muted);font-size:13px}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);padding:0;width:min(520px,calc(100% - 24px));max-height:calc(100% - 24px)}
+dialog::backdrop{background:rgba(10,18,26,.55)}
+.dlg{padding:18px;display:grid;gap:12px}
+.dlg h2{margin:0}
+.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.f input,.f select{border:1px solid var(--line);background:var(--bg);border-radius:9px;padding:9px 10px;font-size:15px;color:var(--ink);width:100%}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f select:disabled{opacity:.45;cursor:not-allowed}
+.f.chk{display:flex;align-items:center;gap:10px;color:var(--ink);font-size:14px}
+.f.chk input{width:auto;margin:0}
+.addrow{display:flex;gap:8px}
+.addrow .btn.add{width:auto;flex:1}
+.btn:disabled{opacity:.5;cursor:default}
+.pk{display:flex;flex-direction:column;gap:8px;max-height:48vh;overflow-y:auto;min-height:0}
+.pi{flex:none;display:grid;grid-template-columns:8px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px 8px 0;overflow:hidden}
+.pi .stripe{align-self:stretch;background:var(--c)}
+.pi b{display:block;font-weight:600;font-size:14px}
+.pi small{display:block;color:var(--muted);font-size:12.5px}
+.pi .btn{padding:6px 12px;font-size:14px}
+.f4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
+.acts .sp{margin-right:auto}
+textarea{width:100%;min-height:120px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:10px;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace}
+.cfg{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Mi CarrerAI</h1>
+    <p id="subtitle"></p>
+    <p id="syncstat" style="font-size:13px"></p>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="resumen">Resumen</button>
+    <button role="tab" data-tab="materias">Materias</button>
+    <button role="tab" data-tab="datos">Datos y metas</button>
+  </nav>
+  <main id="app"></main>
+</div>
+<dialog id="dlg" aria-labelledby="dlgTitle"></dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const KEY = 'fic-carrera-v1';
+const MODS = ['LM','TC','SCP','M','PI'];
+const MOD_NAMES = {
+  LM:'Lenguajes y medios',
+  TC:'Teoría y análisis de la comunicación',
+  SCP:'Sociedad, cultura y políticas de comunicación',
+  M:'Metodología',
+  PI:'Profesional - integral'
+};
+const CYCLES = {
+  ini:{name:'Ciclo inicial', sems:'Semestres 1 y 2'},
+  pro:{name:'Ciclo de profundización', sems:'Semestres 3, 4 y 5'},
+  gra:{name:'Ciclo de graduación', sems:'Semestres 6, 7 y 8'}
+};
+const STATUS = {ap:'Aprobada', cur:'Cursando', ex:'Examen pendiente', pen:'Pendiente'};
+const cycleOf = s => s<=2 ? 'ini' : s<=5 ? 'pro' : 'gra';
+const GRADES = ['E','MB','B','A','I','MI'];
+const PASS = ['E','MB','B','A'];
+const FAIL = ['I','MI'];
+const B = 'https://mallas-curriculares.fic.edu.uy/index.php/licenciatura-en-comunicacion/';
+const ORIENT = [
+  {k:'audiovisual', name:'Audiovisual', url:B + 'audiovisual/'},
+  {k:'educativa', name:'Comunicación Educativa y Comunitaria', url:B + 'educativa-y-comunitaria/'},
+  {k:'periodismo', name:'Periodismo', url:B + 'periodismo/'},
+  {k:'organizacional', name:'Comunicación Organizacional', url:B + 'comunicacion-organizacional/'},
+  {k:'investigacion', name:'Investigación y Análisis de la Comunicación', url:B + 'investigacion-y-analisis-de-la-comunicacion/'},
+  {k:'publicidad', name:'Publicidad', url:B + 'publicidad/'},
+  {k:'multimedia', name:'Multimedia y Tecnologías Digitales', url:B + 'multimedia-y-tecnologias-digitales/'}
+];
+const DEF_CFG = {
+  total:360,
+  modules:{LM:58,TC:50,SCP:50,M:40,PI:84},
+  cycles:{ini:{total:90,obl:72,opt:18}, pro:{total:135,obl:68,opt:67}, gra:{total:135,obl:20,opt:115}},
+  orientMin:{pro:16,gra:16}
+};
+
+const O = {av:'audiovisual', ed:'educativa', pe:'periodismo', og:'organizacional', ia:'investigacion', pu:'publicidad', mm:'multimedia'};
+const E = (s,t,n,c,m,o=[],f=[],note='') => ({s,t,n,c,m,o:o.map(k => O[k]),f,note});
+const CATALOG = [
+  E(1,'opt','Curso Introductorio',2,'PI',[],[],'Figura como obligatorio en el catálogo; lo cargué como optativa, igual que en tu Excel.'),
+  E(1,'obl','Introducción al Estudio del Audiovisual',7,'LM'),
+  E(1,'obl','Teoría de la Comunicación I',9,'TC'),
+  E(1,'obl','Pensamiento Social',6,'SCP'),
+  E(1,'obl','Historia Contemporánea',7,'SCP'),
+  E(1,'obl','Introducción a la Epistemología',8,'M'),
+  E(1,'obl','Introducción a la Universidad',4,'PI'),
+  E(1,'opt','Comprensión Lectora y Escritura en Español',2,'LM'),
+  E(1,'opt','Taller de Producción Académica Estudiantil',4,'LM',[],[],'Se replica en semestre par.'),
+  E(1,'opt','Biblioterapia',5,'SCP'),
+  E(1,'opt','Historia de las Ideas',8,'SCP'),
+  E(1,'opt','Monumentos Como Documentos: Acercamiento al Patrimonio Documental',6,'SCP'),
+  E(2,'obl','Discurso, Técnica y Comunicación',9,'TC'),
+  E(2,'obl','Economía y Política',7,'SCP'),
+  E(2,'obl','Metodología de la Investigación en Información y Comunicación',8,'M'),
+  E(2,'obl','Introducción a las Profesiones de la Comunicación',7,'PI'),
+  E(2,'opt','Terminología',4,'LM',[],['inv']),
+  E(2,'opt','Seminario Miradas Sobre la Lectura',5,'LM'),
+  E(2,'opt','El Imaginario Social Uruguayo',9,'TC',[],['inv']),
+  E(2,'opt','Estado, Justicia y Comunicación',6,'SCP'),
+  E(2,'opt','Consumo, Cultura y Comunicación',9,'SCP',[],['inv']),
+  E(2,'opt','Proceso Cultural del Uruguay',8,'SCP'),
+  E(2,'opt','Argumentación',9,'M',[],[],'Cupo de 330 estudiantes.'),
+  E(2,'opt','Fundamentos de Inteligencia Artificial',6,'M'),
+  E(3,'obl','Lenguaje, cultura y pensamiento',9,'LM',[],[],'Previa de Lengua, Sociedad y Variación.'),
+  E(3,'obl','Comunicación Sonora',6,'LM',['av']),
+  E(3,'obl','Ontologías de la Comunicación Contemporánea',6,'SCP'),
+  E(3,'obl','Estadística Básica',8,'M'),
+  E(3,'opt','Lineamientos para la Elaboración de Contenidos Educativos Digitales Accesibles: Texto, Videos y Podcast',5,'LM'),
+  E(3,'opt','Teoría de la Comunicación II',9,'TC',['ia'],['inv']),
+  E(3,'opt','Herramientas para la Comunicación Participativa',9,'TC',['ed'],['ext']),
+  E(3,'opt','Medios, Política y Democracia',7,'SCP'),
+  E(3,'opt','Alfabetización en Información',5,'SCP'),
+  E(3,'opt','Enfoques de las TIC',8,'PI',['mm'],[],'Previa del Seminario-Taller Trabajo de Grado Multimedia y Tecnologías Digitales.'),
+  E(3,'opt','Edición de Documentos Digitales',5,'PI'),
+  E(3,'opt','Introducción a la Comunicación Organizacional',9,'PI',['og']),
+  E(3,'opt','Introducción a la Comunicación Publicitaria',9,'PI',['pu'],[],'Previa del STG Publicidad I y STG Publicidad II.'),
+  E(3,'opt','Historia de los Documentos',8,'PI',['av'],[],'Cupo de 10. Hay que estar inscripto en la orientación Audiovisual.'),
+  E(4,'obl','Lengua Extranjera: Comprensión Lectora en Portugués (CLP) o en Inglés (CLI)',6,'LM'),
+  E(4,'obl','Teoría del Cine y Medios Audiovisuales',8,'TC',['av'],[],'Previa de Taller Documental I.'),
+  E(4,'obl','Diseño y Análisis',8,'M'),
+  E(4,'opt','Fotografía',8,'LM',['av'],[],'Cupo de 50.'),
+  E(4,'opt','Teorías y Prácticas de la Accesibilidad en la Comunicación',8,'LM'),
+  E(4,'opt','Taller de Comunicación Oral y Escrita',10,'LM',[],[],'Cupo de 35.'),
+  E(4,'opt','Edición I',9,'LM',['av']),
+  E(4,'opt','Diseño Gráfico',9,'LM',['pu'],[],'Cupo de 35. Se dicta en el semestre impar y se replica en el par.'),
+  E(4,'opt','Tecnología Aplicada al Sonido',9,'LM',['av','mm'],[],'Se abren 2 grupos. Cupo de 35 por grupo.'),
+  E(4,'opt','Taller de Interacción',6,'LM',[],[],'Cupo de 15 (solo en 2023).'),
+  E(4,'opt','Cartografías sobre la lectura',5,'LM'),
+  E(4,'opt','Teoría de la Comunicación III',8,'TC',['ia'],['inv']),
+  E(4,'opt','Sociología de la Comunicación',6,'TC'),
+  E(4,'opt','Historia de la Ciencia',8,'TC',['ia'],['inv']),
+  E(4,'opt','Ciencia, Tecnología y Sociedad',null,'SCP',['ia'],['inv'],'Los créditos figuran con asterisco en el catálogo: confirmalos y editalos. Se ofrece bienalmente en los años pares desde 2024.'),
+  E(4,'opt','Pensamiento Crítico e Información Documental',4,'SCP'),
+  E(4,'opt','Industrias Culturales y Plataformas Digitales',9,'SCP',['mm']),
+  E(4,'opt','Estadística III: Introducción a la ciencia de datos',9,'M',[],[],'Cupo de 30.'),
+  E(4,'opt','Diseño de Proyectos: Herramientas Teóricas, Planificación y Desarrollo',4,'M',[],[],'Se suspende por 2026.'),
+  E(4,'opt','Taller de Metodología Cuantitativa',9,'M'),
+  E(4,'opt','Mapeos Comunicacionales',10,'PI',['ed'],['prac'],'Hay que cursar y aprobar dos de estas tres: Intervenir en Comunicación, Mapeos Comunicacionales y Metodologías Participativas de Investigación.'),
+  E(4,'opt','Proyecto Byblos',3,'PI',[],['ext']),
+  E(4,'opt','Comunicación Estratégica',9,'PI',['og']),
+  E(4,'opt','Introducción al Periodismo',9,'PI',['pe','mm'],[],'Previa de Periodismo Informativo.'),
+  E(4,'opt','Curso-Taller en Extensión Universitaria',6,'PI'),
+  E(4,'opt','Tutorías entre Pares',8,'PI'),
+  E(5,'obl','Lengua, Sociedad y Variación',9,'LM'),
+  E(5,'obl','Semiótica',8,'TC'),
+  E(5,'opt','Taller Documental 1',10,'LM',['av']),
+  E(5,'opt','Edición 2',9,'LM',['av']),
+  E(5,'opt','Cuerpo, Género y Comunicación',9,'TC',['ed']),
+  E(5,'opt','Tecnologías para la Preservación Audiovisual 1',8,'SCP'),
+  E(5,'opt','Información, Acceso y Derechos en Uruguay',4,'SCP'),
+  E(5,'opt','Cualitativa 1',9,'M',['ia'],['inv']),
+  E(5,'opt','Metodologías Participativas de Investigación',10,'M',['ed'],['prac']),
+  E(5,'opt','Atención de Cuentas y Marketing',10,'PI',['pu']),
+  E(5,'opt','Laboratorio de Proyectos de Extensión',6,'PI'),
+  E(5,'opt','Identidad e Imagen Organizacional',9,'PI',['og']),
+  E(5,'opt','Periodismo Radial 1',8,'PI',['pe','mm']),
+  E(5,'opt','Periodismo Informativo',8,'PI',['pe','mm']),
+  E(5,'opt','Creatividad Publicitaria 1',9,'PI',['pu']),
+  E(6,'opt','Comunicación e Inteligencia Artificial',9,'LM',['mm']),
+  E(6,'opt','Debates y Desplazamientos de la Investigación en Comunicación',9,'TC',['ia']),
+  E(6,'opt','Intervenir en Comunicación',10,'SCP',['ed'],['prac']),
+  E(6,'opt','Comunicación Política',8,'SCP'),
+  E(6,'opt','Antropología Cultural',9,'SCP'),
+  E(6,'opt','Historia de los Medios',9,'SCP',['ia']),
+  E(6,'opt','Comunicación en Políticas Públicas',9,'SCP',['ed']),
+  E(6,'opt','Psicosociología de los Procesos Comunicacionales',7,'SCP'),
+  E(6,'opt','Sociedad, Cultura y TIC',9,'SCP',['av','mm'],['inv']),
+  E(6,'opt','Ética de la Información y la Comunicación',6,'SCP'),
+  E(6,'opt','Taller de Etnografía Audiovisuales',9,'M',['mm']),
+  E(6,'opt','Diseño de Proyectos en Organizaciones',9,'M',['og']),
+  E(6,'opt','Taller de Etnografía: Comunicación y Territorios del Habitar',10,'M',['mm']),
+  E(6,'opt','Taller del Laboratorio Audiovisual de Contenidos',10,'PI',['av']),
+  E(6,'opt','Periodismo Narrativo',8,'PI',['pe']),
+  E(6,'opt','Periodismo Radial II',9,'PI',['pe','mm']),
+  E(6,'opt','Creatividad Publicitaria II',9,'PI',['pu']),
+  E(6,'opt','Planificación de Medios',7,'PI',['pu']),
+  E(7,'obl','Seminario Trabajo de Grado por Orientación',10,'PI'),
+  E(7,'opt','Historia del Cine Documental',9,'LM',['av']),
+  E(7,'opt','Audiovisión I',9,'LM',['av']),
+  E(7,'opt','Laboratorio de Accesibilidad a los Medios',10,'LM'),
+  E(7,'opt','Taller de Escritura y Defensa de Trabajos Finales en el Grado',4,'LM'),
+  E(7,'opt','Fundamentos Lingüísticos de la Comunicación 1',10,'LM',['ia'],['inv']),
+  E(7,'opt','Ciudadanía en Entornos Digitales',8,'LM'),
+  E(7,'opt','Inteligencia Artificial Avanzada',5,'LM'),
+  E(7,'opt','Psicología Grupal',9,'SCP',[],[],'Cupo de 20. Requiere aprobar antes Psicosociología de los Procesos Comunicacionales.'),
+  E(7,'opt','Libertades Informativas y Regulación del Periodismo',9,'SCP'),
+  E(7,'opt','Psicología Aplicada al Trabajo en Equipo para Profesionales de la Información',4,'SCP'),
+  E(7,'opt','Cualitativa II',9,'M',['ia'],['inv']),
+  E(7,'opt','Seminario de Herramientas Metodológicas para el Trabajo Final de Grado',9,'M',['ia'],['inv']),
+  E(7,'opt','Taller Documental II',10,'PI',[],['prac'],'Cupo de 35. Requiere cursado previo de Taller Documental I.'),
+  E(7,'opt','Sala de Redacción',20,'PI',['pe'],['prac'],'Unidad curricular anual. Requiere aprobar antes Periodismo Informativo. Cupo de 60 (30 por turno).'),
+  E(7,'opt','Publicidad Digital',9,'PI',['pu','mm']),
+  E(7,'opt','Trabajar en Comunicación',8,'PI'),
+  E(8,'obl','Seminario Trabajo de Grado por Orientación',10,'PI'),
+  E(8,'opt','Identidad Colectiva y Literatura para Niños',6,'LM'),
+  E(8,'opt','Arte y Comunicación',9,'LM'),
+  E(8,'opt','Fundamentos Lingüísticos de la Comunicación II',10,'LM',['ia'],['inv']),
+  E(8,'opt','Ética y Ciencia de la Información',6,'SCP'),
+  E(8,'opt','Tecnologías para la Preservación Audiovisual II',8,'SCP'),
+  E(8,'opt','Comunicación y Extensión Rural',9,'SCP',['ed'],['ext']),
+  E(8,'opt','Derechos Culturales y Derecho a la Cultura',6,'SCP'),
+  E(8,'opt','Gestión Cultural en Unidades de Información',5,'SCP'),
+  E(8,'opt','Audiovisión II',null,'',['av'],[],'Cupo de 30. Requiere cursado previo de Audiovisión I. Los créditos no figuran en el catálogo: confirmalos y editalos.'),
+  E(8,'opt','Asuntos Públicos',9,'PI',['og']),
+  E(8,'opt','Marketing Estratégico',9,'PI',['pu']),
+  E(8,'opt','Trabajo Final de Grado (TFG)',40,'',[],['tfg'],'Aporta 40 créditos de optativas en el ciclo de graduación. Asignale el módulo que corresponda al editarlo.')
+];
+const refOf = e => e.s + '|' + e.n;
+const autoOri = s => !!state.orientation && Array.isArray(s.orients) && s.orients.includes(state.orientation);
+const isOri = s => !!s.orient || autoOri(s);
+const norm = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+
+function pickListHtml(){
+  const p = ui.pick, q = norm(p.q);
+  if(p.flt === 'ori' && !state.orientation) return '<p class="empty">Elegí tu orientación en la pestaña Resumen para usar este filtro.</p>';
+  const items = CATALOG.map((e,i) => ({e,i})).filter(({e}) =>
+    (p.cat === 'all' || e.s === +p.cat) &&
+    (p.flt !== 'ori' || e.o.includes(state.orientation)) &&
+    (p.flt !== 'obl' || e.t === 'obl') &&
+    (!q || norm(e.n).includes(q)));
+  if(!items.length) return '<p class="empty">No hay materias con ese filtro.</p>';
+  return items.map(({e,i}) => {
+    const done = state.subjects.some(s => s.ref === refOf(e) || (!s.ref && norm(s.name) === norm(e.n)));
+    const oris = e.o.map(k => (ORIENT.find(x => x.k === k) || {}).name).filter(Boolean).join(' / ');
+    const mine = !!state.orientation && e.o.includes(state.orientation);
+    const tags = [e.f.includes('ext') && 'extensión', e.f.includes('inv') && 'investigación', e.f.includes('prac') && 'práctica preprofesional'].filter(Boolean).join(' · ');
+    return `<div class="pi"><span class="stripe" style="--c:${mc(e.m)}"></span><div><b>${esc(e.n)}</b>
+      <small>${e.c == null ? 'créditos a confirmar' : e.c + ' cr'} · ${typeName(e.t)} · ${e.m || 'módulo a confirmar'}${mine ? ' · de tu orientación' : ''}</small>
+      ${oris ? `<small>${esc(oris)}</small>` : ''}${tags ? `<small>Acredita como: ${tags}</small>` : ''}${e.note ? `<small>${esc(e.note)}</small>` : ''}</div>
+      <button class="btn" data-act="pickadd" data-i="${i}" ${done ? 'disabled' : ''}>${done ? 'Agregada' : 'Agregar'}</button></div>`;
+  }).join('');
+}
+function pickerHtml(){
+  const p = ui.pick;
+  const opt = (arr, cur) => arr.map(([v,l]) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${l}</option>`).join('');
+  return `<div class="dlg">
+    <h2 id="dlgTitle">Catálogo de materias</h2>
+    <p class="sub" style="margin:-6px 0 0">Lo que elijas se agrega al semestre ${p.sem} como pendiente.</p>
+    <div class="f2">
+      <label class="f">Materias del semestre<select id="pk-cat">${opt([['all','Todos'],[1,'Semestre 1'],[2,'Semestre 2'],[3,'Semestre 3'],[4,'Semestre 4'],[5,'Semestre 5'],[6,'Semestre 6'],[7,'Semestre 7'],[8,'Semestre 8']], p.cat)}</select></label>
+      <label class="f">Mostrar<select id="pk-flt">${opt([['all','Todas'],['ori','De mi orientación'],['obl','Obligatorias']], p.flt)}</select></label>
+    </div>
+    <label class="f">Buscar<input id="pk-q" value="${esc(p.q)}" autocomplete="off" placeholder="Nombre de la materia"></label>
+    <div class="pk" id="pk-list">${pickListHtml()}</div>
+    <div class="acts"><button class="btn primary" data-act="pickclose">Listo</button></div>
+  </div>`;
+}
+function paintPickList(){ const el = document.getElementById('pk-list'); if(el) el.innerHTML = pickListHtml(); }
+
+function seed(){
+  let n = 0;
+  const S = (sem,name,cr,type,mod,p1,p2,fin,exam,status='ap') => ({id:'s'+(++n),sem,name,cr,type,mod,p1,p2,fin,exam,status});
+  return [
+    S(1,'CI',2,'opt','PI','','','E',''),
+    S(1,'CLEE',2,'opt','LM','','','',''),
+    S(1,'IEA',7,'obl','LM','E','MB','E',''),
+    S(1,'TC 1',9,'obl','TC','A','A','A',''),
+    S(1,'PS',6,'obl','SCP','','MB','MB',''),
+    S(1,'HC',7,'obl','SCP','B','A','B',''),
+    S(1,'IE',8,'obl','M','A','A','A',''),
+    S(1,'IU',4,'obl','PI','','B','B',''),
+    S(1,'TPAE',4,'opt','LM','','','MB',''),
+    S(2,'DTC',9,'obl','TC','B','B','B',''),
+    S(2,'EYP',7,'obl','SCP','A','MB','B',''),
+    S(2,'MIIC',8,'obl','M','MB','MB','MB',''),
+    S(2,'IPC',7,'obl','PI','MB','MB','MB',''),
+    S(2,'ARG',9,'opt','TC','B','MB','MB',''),
+    S(2,'EJC',6,'opt','SCP','A','E','MB',''),
+    S(7,'Seminario Trabajo de Grado por Orientación',10,'obl','PI','','','','','pen'),
+    S(8,'Seminario Trabajo de Grado por Orientación',10,'obl','PI','','','','','pen'),
+    S(8,'TFG',40,'opt','','','','','','pen')
+  ];
+}
+
+function clean(d){
+  if(!d.cfg.orientMin) d.cfg.orientMin = {pro:16, gra:16};
+  if(!d.v || d.v < 2){
+    const g = d.cfg.cycles && d.cfg.cycles.gra;
+    if(g && g.obl === 60 && g.opt === 75){ g.obl = 20; g.opt = 115; }
+    d.subjects.forEach(s => { if(s.name === 'TFG' && s.type === 'obl') s.type = 'opt'; });
+    d.v = 2;
+  }
+  if(d.v < 3){
+    d.subjects.forEach(s => { if(s.name === 'TFG') s.tfg = true; });
+    d.v = 3;
+  }
+  if(d.v < 4){
+    d.subjects.forEach(s => {
+      if(s.status === 'pen' && s.name === 'Seminario de TFG I' && +s.sem === 6){ s.sem = 7; s.name = 'Seminario Trabajo de Grado por Orientación'; if(!s.mod) s.mod = 'PI'; s.ref = '7|' + s.name; }
+      else if(s.status === 'pen' && s.name === 'Seminario de TFG II' && +s.sem === 7){ s.sem = 8; s.name = 'Seminario Trabajo de Grado por Orientación'; if(!s.mod) s.mod = 'PI'; s.ref = '8|' + s.name; }
+    });
+    d.v = 4;
+  }
+  d.subjects.forEach(s => {
+    ['p1','p2','fin','exam'].forEach(k => { if(!GRADES.includes(s[k])) s[k] = ''; });
+    if(FAIL.includes(s.p1)){ s.p2 = ''; s.fin = ''; }
+    if(PASS.includes(s.fin)) s.exam = ''; s.orient = !!s.orient; s.ext = !!s.ext; s.inv = !!s.inv; s.prac = !!s.prac; s.tfg = !!s.tfg;
+  });
+  return d;
+}
+
+function load(){
+  try{
+    const r = localStorage.getItem(KEY);
+    if(r){
+      const d = JSON.parse(r); hadLocal = true;
+      if(d && Array.isArray(d.subjects) && d.cfg) return clean(d);
+    }
+  }catch(e){}
+  return {v:4, cfg:JSON.parse(JSON.stringify(DEF_CFG)), subjects:[]};
+}
+function save(){ state.ts = Date.now(); try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} if(typeof schedulePush === 'function') schedulePush(); }
+
+let hadLocal = false;
+let state = load();
+const COLKEY = 'fic-carrera-collapsed';
+function loadCol(){ try{ return JSON.parse(localStorage.getItem(COLKEY)) || {}; }catch(e){ return {}; } }
+function saveCol(){ try{ localStorage.setItem(COLKEY, JSON.stringify(ui.collapsed)); }catch(e){} }
+let ui = {tab:'resumen', resetArmed:false, collapsed:loadCol()};
+const $app = document.getElementById('app');
+const $dlg = document.getElementById('dlg');
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mc = m => `var(--m-${m || 'none'})`;
+const sum = a => a.reduce((t,s) => t + (+s.cr || 0), 0);
+const pct = (v,t) => t > 0 ? Math.max(0, Math.min(100, v/t*100)) : 0;
+const typeName = t => t === 'obl' ? 'Obligatoria' : t === 'ele' ? 'Electiva' : 'Optativa';
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('on'), 2200);
+}
+
+function calc(){
+  const subs = state.subjects, cfg = state.cfg;
+  const ap = subs.filter(s => s.status === 'ap');
+  const byMod = {};
+  MODS.forEach(m => byMod[m] = sum(ap.filter(s => s.mod === m)));
+  const noMod = ap.filter(s => !s.mod);
+  const cyc = {};
+  let counted = 0;
+  for(const k of Object.keys(CYCLES)){
+    const items = ap.filter(s => cycleOf(+s.sem) === k);
+    const obl = sum(items.filter(s => s.type === 'obl'));
+    const opt = sum(items.filter(s => s.type !== 'obl'));
+    const req = cfg.cycles[k];
+    const c = Math.min(obl, req.obl) + Math.min(opt, req.opt);
+    const pend = subs.filter(s => cycleOf(+s.sem) === k && s.type === 'obl' && s.status !== 'ap').map(s => s.name);
+    const ori = sum(items.filter(s => s.type === 'opt' && isOri(s)));
+    const oriReq = (cfg.orientMin && cfg.orientMin[k]) || 0;
+    cyc[k] = {obl, opt, counted:c, req, pend, ori, oriReq};
+    counted += c;
+  }
+  const inProgress = sum(subs.filter(s => s.status === 'cur' || s.status === 'ex'));
+  return {byMod, noMod, cyc, counted, total:sum(ap), inProgress};
+}
+
+/* ---------- RESUMEN ---------- */
+function reqCard(){
+  const c = calc(), cfg = state.cfg;
+  const ap = state.subjects.filter(s => s.status === 'ap');
+  const names = a => a.map(s => esc(s.name)).join(', ');
+  const flag = k => ap.filter(s => s[k]);
+  const modsMissing = MODS.filter(m => c.byMod[m] < cfg.modules[m]);
+  const oriOk = !!state.orientation && c.cyc.pro.ori >= c.cyc.pro.oriReq && c.cyc.gra.ori >= c.cyc.gra.oriReq;
+  const ext = flag('ext'), inv = flag('inv'), prac = flag('prac'), tfg = flag('tfg'), ele = ap.filter(s => s.type === 'ele');
+  const items = [
+    [c.counted >= cfg.total, `Tener ${cfg.total} créditos aprobados`, `${c.counted} de ${cfg.total}`],
+    [modsMissing.length === 0, 'Cumplir los créditos mínimos de cada módulo', modsMissing.length ? 'Faltan: ' + modsMissing.join(', ') : 'Los 5 módulos completos'],
+    [oriOk, 'Completar los créditos mínimos de la orientación', `Profundización ${c.cyc.pro.ori}/${c.cyc.pro.oriReq} · Graduación ${c.cyc.gra.ori}/${c.cyc.gra.oriReq}` + (state.orientation ? '' : ' · Todavía no elegiste orientación')],
+    [ext.length > 0, 'Una experiencia de extensión universitaria', ext.length ? names(ext) : 'Marcá una materia aprobada como extensión'],
+    [inv.length > 0, 'Una experiencia de investigación', inv.length ? names(inv) : 'Marcá una materia aprobada como investigación'],
+    [prac.length > 0, 'Una práctica preprofesional', prac.length ? names(prac) : 'Marcá una materia aprobada como práctica preprofesional'],
+    [ele.length > 0, 'Una unidad curricular electiva en otra carrera', ele.length ? names(ele) : 'Sin electivas aprobadas'],
+    [tfg.length > 0, 'Trabajo final de grado (TFG) aprobado', tfg.length ? names(tfg) : 'Marcá la materia del TFG y aprobala']
+  ];
+  const n = items.filter(i => i[0]).length;
+  return `<section class="card"><h2>Requisitos para egresar</h2>
+    <p class="sub" style="margin:-6px 0 12px">${n} de ${items.length} cumplidos</p>
+    <ul class="req">${items.map(([ok,t,d]) => `<li><span class="pill ${ok ? 'st-ap' : 'st-pen'}">${ok ? 'Cumplido' : 'Falta'}</span><div><b>${t}</b><small>${d}</small></div></li>`).join('')}</ul>
+  </section>`;
+}
+
+function orientCard(){
+  const cur = ORIENT.find(o => o.k === state.orientation);
+  const c = calc();
+  const opts = [['','Sin elegir'], ...ORIENT.map(o => [o.k, o.name])]
+    .map(([v,l]) => `<option value="${v}" ${(state.orientation || '') === v ? 'selected' : ''}>${esc(l)}</option>`).join('');
+  return `<section class="card"><h2>Orientación</h2>
+    <label class="f">Tu orientación<select data-orient>${opts}</select></label>
+    <p class="sub" style="margin:8px 0 0">Optativas que acreditan a la orientación: profundización ${c.cyc.pro.ori} de ${c.cyc.pro.oriReq}, graduación ${c.cyc.gra.ori} de ${c.cyc.gra.oriReq}. Se marcan al editar cada materia.</p>
+    ${cur ? `<p class="sub"><a href="${cur.url}" target="_blank" rel="noopener">Ver la malla de ${esc(cur.name)}</a></p>` : ''}
+  </section>`;
+}
+
+function viewResumen(){
+  const c = calc(), cfg = state.cfg;
+  const segs = MODS.map(m => `<i title="${m}: ${c.byMod[m]} cr" style="width:${pct(c.byMod[m], cfg.total)}%;background:${mc(m)}"></i>`).join('')
+    + (sum(c.noMod) ? `<i title="Sin módulo" style="width:${pct(sum(c.noMod), cfg.total)}%;background:${mc('')}"></i>` : '');
+  const legend = MODS.map(m => `<span><span class="dot" style="background:${mc(m)}"></span>${m} <b>${c.byMod[m]}</b></span>`).join('')
+    + (sum(c.noMod) ? `<span><span class="dot" style="background:${mc('')}"></span>Sin módulo <b>${sum(c.noMod)}</b></span>` : '');
+  const left = Math.max(0, cfg.total - c.counted);
+  const extra = c.total > c.counted
+    ? `Aprobaste ${c.total} créditos en total; ${c.total - c.counted} son excedente de optativas en algún ciclo y no suman al egreso.`
+    : '';
+  const alert = sum(c.noMod)
+    ? `<div class="alert">Tenés ${c.noMod.length} materia(s) aprobada(s) sin módulo asignado (${sum(c.noMod)} cr). No cuentan para ningún módulo hasta que se lo asignes.</div>` : '';
+
+  const hero = `
+  <section class="card hero">
+    <div class="big">${c.counted}<span>de ${cfg.total} créditos</span></div>
+    <p>${left > 0 ? `Te faltan ${left} para egresar.` : 'Completaste los créditos para egresar.'}${c.inProgress ? ` Tenés ${c.inProgress} en curso.` : ''}${extra ? ' ' + esc(extra) : ''}</p>
+    <div class="stack" role="img" aria-label="Créditos aprobados por módulo">${segs}</div>
+    <div class="legend">${legend}</div>
+  </section>`;
+
+  const mods = MODS.map(m => {
+    const v = c.byMod[m], t = cfg.modules[m];
+    const done = v >= t;
+    return `<div class="mod">
+      <div class="n"><span class="chip" style="--c:${mc(m)}">${m}</span><span class="sub" style="margin:0">${done ? 'Completo' : 'Faltan ' + (t - v)}</span></div>
+      <div class="sub" style="margin:6px 0 0">${esc(MOD_NAMES[m])}</div>
+      <div class="v">${v}<small> / ${t} mín.</small></div>
+      <div class="bar" style="--c:${mc(m)}"><i style="width:${pct(v,t)}%"></i></div>
+      ${v > t ? `<div class="sub">+${v - t} sobre el mínimo</div>` : ''}
+    </div>`;
+  }).join('');
+  const modSum = MODS.reduce((t,m) => t + cfg.modules[m], 0);
+  const modules = `<section class="card"><h2>Mínimos por módulo</h2><div class="grid">${mods}</div>
+    <p class="sub">Los mínimos de módulo suman ${modSum} de ${cfg.total} créditos; el resto (${Math.max(0, cfg.total - modSum)}) puede venir de cualquier módulo.</p></section>`;
+
+  const cycles = Object.keys(CYCLES).map(k => {
+    const d = c.cyc[k], r = d.req;
+    return `<div class="cyc">
+      <div class="hd"><b>${CYCLES[k].name}</b><span class="sub" style="margin:0">${CYCLES[k].sems} · ${d.counted} / ${r.total}</span></div>
+      <div class="two">
+        <div><div class="lbl"><span>Obligatorias</span><span>${d.obl} / ${r.obl}</span></div><div class="bar"><i style="width:${pct(d.obl, r.obl)}%"></i></div></div>
+        <div><div class="lbl"><span>Optativas y electivas</span><span>${d.opt} / ${r.opt}</span></div><div class="bar"><i style="width:${pct(d.opt, r.opt)}%"></i></div></div>
+      </div>
+      ${d.opt > r.opt ? `<div class="sub">Tenés ${d.opt - r.opt} cr de optativas por encima de lo que pide este ciclo.</div>` : ''}
+      ${d.oriReq ? `<div style="margin-top:10px"><div class="lbl"><span>Optativas de tu orientación</span><span>${d.ori} / ${d.oriReq}</span></div><div class="bar"><i style="width:${pct(d.ori, d.oriReq)}%"></i></div></div>` : ''}
+      ${d.pend.length ? `<div class="sub">Obligatorias pendientes: ${d.pend.map(esc).join(', ')}.</div>` : ''}
+    </div>`;
+  }).join('');
+
+  return alert + hero + reqCard() + orientCard() + modules + `<section class="card"><h2>Avance por ciclo</h2>${cycles}</section>`;
+}
+
+/* ---------- MATERIAS ---------- */
+function gradesLine(s){
+  const parts = [];
+  if(s.p1 && s.p1 !== '-') parts.push('1er parcial ' + esc(s.p1));
+  if(s.p2 && s.p2 !== '-') parts.push('2do parcial ' + esc(s.p2));
+  if(s.exam && s.exam !== '-') parts.push('Examen ' + esc(s.exam));
+  return parts.join(' · ');
+}
+function viewMaterias(){
+  let out = '<div class="acts" style="margin-bottom:12px"><button class="btn" data-act="colall">Ocultar todos</button><button class="btn" data-act="expall">Mostrar todos</button></div>';
+  for(let n = 1; n <= 8; n++){
+    const list = state.subjects.filter(s => +s.sem === n);
+    const ap = list.filter(s => s.status === 'ap');
+    const obl = sum(ap.filter(s => s.type === 'obl')), opt = sum(ap.filter(s => s.type === 'opt')), ele = sum(ap.filter(s => s.type === 'ele'));
+    const rows = list.map(s => {
+      const g = gradesLine(s);
+      return `<button class="row" data-act="edit" data-id="${esc(s.id)}">
+        <span class="stripe" style="--c:${mc(s.mod)}"></span>
+        <span class="main"><b>${esc(s.name)}</b>
+          <small>${esc(s.cr)} cr · ${typeName(s.type)} · ${s.mod ? esc(s.mod) : 'sin módulo'}${isOri(s) ? ' · de la orientación' : ''}${[s.ext && 'extensión', s.inv && 'investigación', s.prac && 'práctica', s.tfg && 'TFG'].filter(Boolean).map(t => ' · ' + t).join('')}</small>
+          ${g ? `<small>${g}</small>` : ''}</span>
+        <span class="right">${s.fin ? `<span class="fin">${esc(s.fin)}</span>` : ''}<span class="pill st-${s.status}">${STATUS[s.status] || ''}</span></span>
+      </button>`;
+    }).join('');
+    out += `<section class="sem">
+      <div class="hd"><h2><button class="tog" data-act="toggle" data-sem="${n}" aria-expanded="${ui.collapsed[n] ? 'false' : 'true'}">Semestre ${n}</button></h2><span>${sum(ap)} de ${sum(list)} cr aprobados · Oblig. ${obl} · Opt. ${opt} · Elect. ${ele}</span></div>
+      <div${ui.collapsed[n] ? ' hidden' : ''}>${rows || '<p class="empty">Todavía no cargaste materias en este semestre.</p>'}
+      <div class="addrow"><button class="btn add" data-act="pick" data-sem="${n}">Elegir del catálogo</button><button class="btn add" data-act="add" data-sem="${n}">Agregar manualmente</button></div></div>
+    </section>`;
+  }
+  return out;
+}
+
+/* ---------- DATOS ---------- */
+function viewDatos(){
+  const cfg = state.cfg;
+  const inp = (path, label, val) => `<label class="f">${label}<input type="number" min="0" inputmode="numeric" data-cfg="${path}" value="${esc(val)}"></label>`;
+  const modInputs = MODS.map(m => inp('modules.' + m, MOD_NAMES[m], cfg.modules[m])).join('');
+  const cycInputs = Object.keys(CYCLES).map(k => `
+    <div><h3 style="font-size:15px;margin:10px 0 6px">${CYCLES[k].name}</h3>
+    <div class="cfg">${inp('cycles.'+k+'.total','Total',cfg.cycles[k].total)}${inp('cycles.'+k+'.obl','Obligatorias',cfg.cycles[k].obl)}${inp('cycles.'+k+'.opt','Optativas y electivas',cfg.cycles[k].opt)}</div></div>`).join('');
+  return `
+  <section class="card"><h2>Metas de la carrera</h2>
+    <div class="cfg">${inp('total','Créditos para egresar',cfg.total)}</div>
+    <h3 style="font-size:15px;margin:14px 0 6px">Mínimo por módulo</h3>
+    <div class="cfg">${modInputs}</div>
+    <h3 style="font-size:15px;margin:14px 0 6px">Optativas mínimas de la orientación</h3>
+    <div class="cfg">${inp('orientMin.pro','Profundización',cfg.orientMin.pro)}${inp('orientMin.gra','Graduación',cfg.orientMin.gra)}</div>
+    ${cycInputs}
+  </section>
+  <section class="card"><h2>Copia de seguridad</h2>
+    <p class="sub" style="margin-top:0">Tus datos se guardan en este navegador y, si abrís la app con tu sesión de Claude, también en tu cuenta para verlos en todos tus dispositivos. Copiá este texto y guardalo para no perderlos, o pegá uno anterior abajo para restaurarlo.</p>
+    <textarea id="exp" readonly aria-label="Datos exportados"></textarea>
+    <div class="acts" style="margin:8px 0 14px"><button class="btn" data-act="copy">Copiar datos</button></div>
+    <textarea id="imp" placeholder="Pegá acá los datos guardados" aria-label="Datos a importar"></textarea>
+    <div class="acts" style="margin-top:8px"><button class="btn primary" data-act="import">Restaurar datos</button></div>
+  </section>
+  <section class="card"><h2>Empezar de cero</h2>
+    <p class="sub" style="margin-top:0">Borra todas las materias y la orientación, y deja las metas con los valores originales. La app queda en blanco.</p>
+    <button class="btn danger" data-act="reset">${ui.resetArmed ? 'Tocá de nuevo para confirmar' : 'Borrar todo'}</button>
+  </section>`;
+}
+
+/* ---------- RENDER ---------- */
+function render(){
+  const ori = ORIENT.find(o => o.k === state.orientation);
+  document.getElementById('subtitle').textContent = `FIC · ${state.cfg.total} créditos para egresar` + (ori ? ` · ${ori.name}` : '');
+  document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === ui.tab ? 'true' : 'false'));
+  paintSync();
+  $app.innerHTML = conflictBanner() + (ui.tab === 'resumen' ? viewResumen() : ui.tab === 'materias' ? viewMaterias() : viewDatos());
+  if(ui.tab === 'datos'){
+    const e = document.getElementById('exp'); if(e) e.value = JSON.stringify(state);
+  }
+}
+
+/* ---------- DIALOGO ---------- */
+function openDlg(id, sem){
+  const s = id ? state.subjects.find(x => x.id === id)
+    : {id:'', sem:sem || 1, name:'', cr:'', type:'obl', mod:'', p1:'', p2:'', fin:'', exam:'', status:'pen', orient:false, ext:false, inv:false, prac:false, tfg:false};
+  if(!s) return;
+  const opts = (arr, cur) => arr.map(([v,l]) => `<option value="${v}" ${String(cur) === String(v) ? 'selected' : ''}>${l}</option>`).join('');
+  const gsel = (id, label, cur) => `<label class="f">${label}<select id="f-${id}">${opts([['','Sin nota'], ...GRADES.map(g => [g,g])], cur)}</select></label>`;
+  $dlg.innerHTML = `<div class="dlg">
+    <h2 id="dlgTitle">${id ? 'Editar materia' : 'Nueva materia'}</h2>
+    <label class="f">Nombre<input id="f-name" value="${esc(s.name)}" autocomplete="off"></label>
+    <div class="f2">
+      <label class="f">Semestre<select id="f-sem">${opts([1,2,3,4,5,6,7,8].map(n => [n,'Semestre ' + n]), s.sem)}</select></label>
+      <label class="f">Créditos<input id="f-cr" type="number" min="0" inputmode="numeric" value="${esc(s.cr)}"></label>
+    </div>
+    <div class="f2">
+      <label class="f">Carácter<select id="f-type">${opts([['obl','Obligatoria'],['opt','Optativa'],['ele','Electiva']], s.type)}</select></label>
+      <label class="f">Módulo<select id="f-mod">${opts([['','Sin asignar'], ...MODS.map(m => [m, m + ' · ' + MOD_NAMES[m]])], s.mod)}</select></label>
+    </div>
+    <label class="f chk"><input type="checkbox" id="f-orient" ${isOri(s) ? 'checked' : ''} ${autoOri(s) ? 'disabled' : ''}> Optativa que acredita a mi orientación</label>
+    <div class="f2">
+      <label class="f chk"><input type="checkbox" id="f-ext" ${s.ext ? 'checked' : ''}> Cuenta como extensión</label>
+      <label class="f chk"><input type="checkbox" id="f-inv" ${s.inv ? 'checked' : ''}> Cuenta como investigación</label>
+      <label class="f chk"><input type="checkbox" id="f-prac" ${s.prac ? 'checked' : ''}> Práctica preprofesional</label>
+      <label class="f chk"><input type="checkbox" id="f-tfg" ${s.tfg ? 'checked' : ''}> Es el TFG</label>
+    </div>
+    <label class="f">Estado<select id="f-status">${opts(Object.entries(STATUS), s.status)}</select></label>
+    <div class="f4">
+      ${gsel('p1','1er parcial',s.p1)}
+      ${gsel('p2','2do parcial',s.p2)}
+      ${gsel('fin','Nota final',s.fin)}
+      ${gsel('exam','Examen',s.exam)}
+    </div>
+    <p class="sub" style="margin:0">Con I o MI en el 1er parcial, el 2do parcial y la nota final se bloquean y la materia va a examen. Con nota final E, MB, B o A, el examen se bloquea. El estado se actualiza solo: Aprobada con E, MB, B o A (en la nota final o en el examen) y Examen pendiente con I o MI.</p>
+    <div class="acts">
+      ${id ? '<button class="btn danger sp" data-act="del">Eliminar</button>' : ''}
+      <button class="btn" data-act="cancel">Cancelar</button>
+      <button class="btn primary" data-act="save" data-id="${esc(s.id)}">Guardar</button>
+    </div>
+  </div>`;
+  $dlg.showModal(); applyLocks();
+}
+function applyLocks(src){
+  const g = k => document.getElementById('f-' + k);
+  const failP1 = FAIL.includes(g('p1').value);
+  g('p2').disabled = failP1; g('fin').disabled = failP1;
+  if(failP1){ g('p2').value = ''; g('fin').value = ''; }
+  if(src === 'p1' || src === 'p2'){
+    const a = g('p1').value, b = g('p2').value, fn = g('fin');
+    if(!failP1 && a && a === b && PASS.includes(a)){ fn.value = a; fn.dataset.auto = '1'; }
+    else if(fn.dataset.auto === '1'){ fn.value = ''; fn.dataset.auto = ''; }
+  }
+  if(src === 'fin') g('fin').dataset.auto = '';
+  const passFin = PASS.includes(g('fin').value);
+  g('exam').disabled = passFin;
+  if(passFin) g('exam').value = '';
+  if(src){
+    const ex = g('exam').value, fv = g('fin').value, st = g('status');
+    if(PASS.includes(ex) || PASS.includes(fv)) st.value = 'ap';
+    else if(FAIL.includes(fv) || FAIL.includes(ex) || failP1) st.value = 'ex';
+  }
+}
+$dlg.addEventListener('change', e => { if(['f-p1','f-p2','f-fin','f-exam'].includes(e.target.id)) applyLocks(e.target.id.slice(2)); });
+$dlg.addEventListener('keydown', e => {
+  if(e.key !== 'Enter' || e.isComposing) return;
+  const t = e.target;
+  if(t.tagName !== 'INPUT' && t.tagName !== 'SELECT') return;
+  const btn = $dlg.querySelector('[data-act="save"]');
+  if(!btn) return;
+  e.preventDefault();
+  saveDlg(btn.dataset.id);
+});
+function saveDlg(id){
+  const v = k => document.getElementById('f-' + k).value.trim();
+  const name = v('name');
+  if(!name){ toast('Poné un nombre para la materia'); return; }
+  const data = {name, sem:+v('sem'), cr:+v('cr') || 0, type:v('type'), mod:v('mod'), status:v('status'), p1:v('p1'), p2:v('p2'), fin:v('fin'), exam:v('exam'), orient:((c) => c && autoOri(c) ? !!c.orient : document.getElementById('f-orient').checked)(state.subjects.find(x => x.id === id)), ext:document.getElementById('f-ext').checked, inv:document.getElementById('f-inv').checked, prac:document.getElementById('f-prac').checked, tfg:document.getElementById('f-tfg').checked};
+  if(id && state.subjects.some(x => x.id === id)){ Object.assign(state.subjects.find(x => x.id === id), data); }
+  else { state.subjects.push({id:'s' + Date.now().toString(36), ...data}); }
+  save(); $dlg.close(); render(); toast('Materia guardada');
+}
+
+/* ---------- EVENTOS ---------- */
+document.addEventListener('click', e => {
+  const tab = e.target.closest('[data-tab]');
+  if(tab){ ui.tab = tab.dataset.tab; ui.resetArmed = false; render(); window.scrollTo(0,0); return; }
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  const act = el.dataset.act;
+  if(act === 'edit') openDlg(el.dataset.id);
+  else if(act === 'add') openDlg('', +el.dataset.sem);
+  else if(act === 'pick'){
+    const sem = +el.dataset.sem;
+    ui.pick = {sem, cat:sem, q:'', flt:'all'};
+    $dlg.innerHTML = pickerHtml(); $dlg.showModal();
+  }
+  else if(act === 'pickadd'){
+    const e2 = CATALOG[+el.dataset.i];
+    if(e2 && !state.subjects.some(s => s.ref === refOf(e2))){
+      state.subjects.push({id:'s' + Date.now().toString(36) + Math.random().toString(36).slice(2,5), sem:ui.pick.sem, name:e2.n, cr:e2.c || 0, type:e2.t, mod:e2.m || '', status:'pen', p1:'', p2:'', fin:'', exam:'', orient:false, ext:e2.f.includes('ext'), inv:e2.f.includes('inv'), prac:e2.f.includes('prac'), tfg:e2.f.includes('tfg'), orients:e2.o.slice(), ref:refOf(e2)});
+      save(); render(); paintPickList(); toast('Agregada al semestre ' + ui.pick.sem);
+    }
+  }
+  else if(act === 'pickclose') $dlg.close();
+  else if(act === 'cancel') $dlg.close();
+  else if(act === 'toggle'){ const n = el.dataset.sem; ui.collapsed[n] = !ui.collapsed[n]; saveCol(); render(); }
+  else if(act === 'colall'){ for(let n = 1; n <= 8; n++) ui.collapsed[n] = true; saveCol(); render(); }
+  else if(act === 'expall'){ ui.collapsed = {}; saveCol(); render(); }
+  else if(act === 'useRemote'){
+    const r = sync.conflict; sync.conflict = null;
+    if(r){ state = clean(clone(r.state)); state.ts = r.ts || Date.now(); persist(); }
+    render(); setStatus('ok'); toast('Usando los datos de tu cuenta');
+  }
+  else if(act === 'useLocal'){ sync.conflict = null; save(); render(); toast('Usando los datos de este dispositivo'); }
+  else if(act === 'save') saveDlg(el.dataset.id);
+  else if(act === 'del'){
+    const id = $dlg.querySelector('[data-act="save"]').dataset.id;
+    state.subjects = state.subjects.filter(x => x.id !== id);
+    save(); $dlg.close(); render(); toast('Materia eliminada');
+  }
+  else if(act === 'copy'){
+    const t = document.getElementById('exp'); t.select();
+    try{ navigator.clipboard.writeText(t.value).then(() => toast('Datos copiados')).catch(() => { document.execCommand('copy'); toast('Datos copiados'); }); }
+    catch(err){ try{ document.execCommand('copy'); toast('Datos copiados'); }catch(e2){ toast('Seleccioná el texto y copialo a mano'); } }
+  }
+  else if(act === 'import'){
+    try{
+      const d = JSON.parse(document.getElementById('imp').value);
+      if(!d || !Array.isArray(d.subjects) || !d.cfg) throw new Error('formato');
+      state = clean(d); save(); render(); toast('Datos restaurados');
+    }catch(err){ toast('Ese texto no tiene el formato correcto'); }
+  }
+  else if(act === 'reset'){
+    if(!ui.resetArmed){ ui.resetArmed = true; render(); return; }
+    state = {v:4, cfg:JSON.parse(JSON.stringify(DEF_CFG)), subjects:[]}; ui.resetArmed = false;
+    save(); render(); toast('Datos borrados');
+  }
+});
+document.addEventListener('change', e => {
+  if(e.target.dataset && 'orient' in e.target.dataset){ state.orientation = e.target.value; save(); render(); return; }
+  const p = e.target.dataset && e.target.dataset.cfg;
+  if(!p) return;
+  const parts = p.split('.'); let o = state.cfg;
+  while(parts.length > 1) o = o[parts.shift()];
+  o[parts[0]] = Math.max(0, +e.target.value || 0);
+  save(); render();
+});
+$dlg.addEventListener('click', e => { if(e.target === $dlg) $dlg.close(); });
+
+/* ---------- SINCRONIZACION ---------- */
+const SYNC_MSG = {
+  connecting:'Conectando con tu cuenta…',
+  local:'Guardado solo en este dispositivo',
+  saving:'Sincronizando…',
+  ok:'Sincronizado con tu cuenta',
+  error:'No se pudo sincronizar; tus datos siguen guardados en este dispositivo'
+};
+let sync = {ref:null, status:'connecting', timer:null, busy:false, dirty:false, conflict:null, retried:false};
+let pendingRemote = null;
+const clone = x => JSON.parse(JSON.stringify(x));
+function paintSync(){ const el = document.getElementById('syncstat'); if(el) el.textContent = SYNC_MSG[sync.status] || ''; }
+function setStatus(s){ sync.status = s; paintSync(); }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function conflictBanner(){
+  if(!sync.conflict) return '';
+  return `<div class="alert"><b>Hay datos distintos en tu cuenta y en este dispositivo.</b> ¿Cuáles querés usar?
+    <div class="acts" style="justify-content:flex-start;margin-top:8px"><button class="btn" data-act="useRemote">Usar los de mi cuenta</button><button class="btn" data-act="useLocal">Usar los de este dispositivo</button></div></div>`;
+}
+function schedulePush(){
+  if(!sync.ref) return;
+  sync.dirty = true; clearTimeout(sync.timer); sync.timer = setTimeout(flush, 800);
+}
+async function flush(){
+  if(!sync.ref || sync.busy || !sync.dirty) return;
+  sync.busy = true; sync.dirty = false; setStatus('saving');
+  try{
+    await sync.ref.set({state:clone(state), ts:state.ts});
+    sync.retried = false; setStatus('ok');
+  }catch(e){
+    const code = e && e.code;
+    if(code === 'unavailable' && !sync.retried){ sync.retried = true; sync.dirty = true; setTimeout(flush, 4000); setStatus('error'); }
+    else if(code === 'invalid_argument'){ setStatus('local'); }
+    else setStatus('error');
+  }
+  sync.busy = false;
+  if(sync.dirty && sync.status !== 'error') flush();
+}
+function applyRemote(r){
+  state = clean(clone(r.state)); state.ts = r.ts;
+  persist(); render(); setStatus('ok'); toast('Datos actualizados desde otro dispositivo');
+}
+function adopt(r){ if($dlg.open){ pendingRemote = r; return; } applyRemote(r); }
+const slim = x => JSON.stringify({c:x.cfg, s:x.subjects, o:x.orientation || ''});
+function remoteCheck(r, initial){
+  if(!r || !r.state || !Array.isArray(r.state.subjects) || !r.state.cfg) return;
+  if(sync.conflict){ sync.conflict = r; return; }
+  const rts = +r.ts || 0, lts = +state.ts || 0;
+  if(initial && hadLocal && !lts){
+    if(slim(clean(clone(r.state))) === slim(state)){ state.ts = rts; persist(); setStatus('ok'); return; }
+    sync.conflict = r; render(); return;
+  }
+  if(rts > lts) adopt(r);
+  else if(rts < lts) schedulePush();
+  else if(!sync.busy) setStatus('ok');
+}
+async function initSync(){
+  try{
+    if(!window.claude || !window.claude.use){ setStatus('local'); return; }
+    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    if(!db || !user){ setStatus('local'); return; }
+    const uid = await user.id();
+    if(!uid){ setStatus('local'); return; }
+    sync.ref = db.collection('data/users/' + uid).doc('carrera');
+    const snap = await sync.ref.get();
+    if(snap.exists){ remoteCheck(snap.data(), true); }
+    else if(hadLocal || state.ts){
+      if(!state.ts){ state.ts = Date.now(); persist(); }
+      schedulePush();
+    } else setStatus('ok');
+    if(sync.status === 'connecting') setStatus('ok');
+    sync.ref.onSnapshot(s => { if(s.exists) remoteCheck(s.data(), false); }, () => setStatus('error'));
+  }catch(e){ setStatus('local'); }
+}
+$dlg.addEventListener('input', e => { if(e.target.id === 'pk-q'){ ui.pick.q = e.target.value; paintPickList(); } });
+$dlg.addEventListener('change', e => {
+  if(e.target.id === 'pk-cat'){ ui.pick.cat = e.target.value; paintPickList(); }
+  else if(e.target.id === 'pk-flt'){ ui.pick.flt = e.target.value; paintPickList(); }
+});
+$dlg.addEventListener('close', () => {
+  if(pendingRemote){ const r = pendingRemote; pendingRemote = null; if((+r.ts || 0) > (+state.ts || 0)) applyRemote(r); }
+});
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden && sync.dirty){ clearTimeout(sync.timer); flush(); }
+});
+initSync();
+
+render();
+</script>
+</body>
+</html>
